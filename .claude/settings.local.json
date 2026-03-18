@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias \"@/*\" --no-eslint --yes)",
+      "Read(//Users/akh./Documents/Persona/**)",
+      "Bash(npx create-next-app@latest newsletter-temp --typescript --tailwind --app --src-dir --import-alias \"@/*\" --no-eslint --yes)",
+      "Bash(mv newsletter-temp/* NewsLetter/)",
+      "Bash(mv newsletter-temp/.* NewsLetter/)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm run:*)",
+      "Bash(sqlite3 /Users/akh./Documents/Persona/NewsLetter/prisma/dev.db \".tables\")",
+      "Read(//usr/local/bin/**)",
+      "Bash(node -e:*)",
+      "Bash(/usr/bin/sqlite3 /Users/akh./Documents/Persona/NewsLetter/prisma/dev.db \".tables\")",
+      "Bash(ls -la /Users/akh./Documents/Persona/NewsLetter/*.db)",
+      "Bash(npx tsx:*)"
+    ]
+  }
+}

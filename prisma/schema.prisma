@@ -1,0 +1,68 @@
+// Aalarabi Newsletter — Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Newsletter {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String    @unique
+  description String
+  content     String
+  coverImage  String?   @map("cover_image")
+  status      String    @default("draft")
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("newsletters")
+}
+
+model Subscriber {
+  id               Int      @id @default(autoincrement())
+  firstName        String   @map("first_name")
+  email            String   @unique
+  unsubscribeToken String?  @unique @map("unsubscribe_token")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("subscribers")
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
+
+model SiteSettings {
+  id          Int      @id @default(autoincrement())
+  siteName    String   @default("العربي") @map("site_name")
+  description String   @default("")
+  logoUrl     String?  @map("logo_url")
+  accentColor String   @default("#e63946") @map("accent_color")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model SocialLink {
+  id        Int      @id @default(autoincrement())
+  title     String
+  url       String
+  platform  String?
+  iconUrl   String?  @map("icon_url")
+  enabled   Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("social_links")
+}

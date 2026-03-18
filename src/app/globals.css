@@ -1,26 +1,159 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", Arial, Helvetica, sans-serif;
+  --color-primary: #1a1a2e;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #e63946;
+  --color-muted: #f8f8f8;
+  --color-muted-foreground: #6b7280;
+  --color-border: #e5e7eb;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a2e;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background-color: #ffffff;
+  color: #1a1a2e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* RTL prose override */
+.prose {
+  direction: rtl;
+  text-align: right;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.5em;
+  padding-inline-end: 0;
+}
+
+/* Tiptap editor base styles */
+.tiptap {
+  outline: none;
+  min-height: 400px;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: right;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Tiptap task list */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+.tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+.tiptap ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+.tiptap ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+/* Tiptap blockquote */
+.tiptap blockquote {
+  border-right: 4px solid #e63946;
+  border-left: none;
+  padding-right: 1rem;
+  padding-left: 0;
+  margin-right: 0;
+  color: #4b5563;
+  font-style: italic;
+}
+
+/* Tiptap code */
+.tiptap code {
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+  font-size: 0.875em;
+}
+.tiptap pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+}
+.tiptap pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.875em;
+}
+
+/* Tiptap horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+/* Tiptap images */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Smooth transitions */
+a,
+button {
+  transition: all 0.15s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
