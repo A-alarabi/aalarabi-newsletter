@@ -69,7 +69,7 @@ export default async function NewsletterPage({ params }: PageProps) {
             <time className="text-sm text-gray-400 font-medium">
               {formatDate(date)}
             </time>
-            <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-[#1a1a2e] dark:text-gray-100 leading-tight">
+            <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-[#1a1a2e] leading-tight">
               {newsletter.title}
             </h1>
             <p className="mt-3 text-base text-gray-500 leading-relaxed border-r-4 border-[#e63946] pr-4">
@@ -77,7 +77,7 @@ export default async function NewsletterPage({ params }: PageProps) {
             </p>
           </header>
 
-          <hr className="border-gray-100 dark:border-gray-800 mb-8" />
+          <hr className="border-gray-100 mb-8" />
 
           {/* Content */}
           <NewsletterContent content={newsletter.content} />
