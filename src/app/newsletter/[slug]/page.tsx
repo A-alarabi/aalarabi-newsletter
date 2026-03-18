@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import SiteHeader from '@/components/layout/SiteHeader'
-import Footer from '@/components/layout/Footer'
 import NewsletterContent from '@/components/newsletter/NewsletterContent'
 import SubscriptionForm from '@/components/newsletter/SubscriptionForm'
 import { prisma } from '@/lib/prisma'
@@ -89,7 +88,7 @@ export default async function NewsletterPage({ params }: PageProps) {
         </section>
       </main>
 
-      <Footer />
+
     </>
   )
 }

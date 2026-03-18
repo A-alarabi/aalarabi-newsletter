@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
 import SiteHeader from '@/components/layout/SiteHeader'
-import Footer from '@/components/layout/Footer'
 import NewsletterGrid from '@/components/home/NewsletterGrid'
 import SubscriptionForm from '@/components/newsletter/SubscriptionForm'
 import { prisma } from '@/lib/prisma'
@@ -46,8 +45,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <>
       <SiteHeader />
 
-      <main className="min-h-screen">
-        {/* Newsletter list */}
+      <main>
         <section className="max-w-5xl mx-auto px-6 sm:px-10 py-10">
           {search && (
             <div className="mb-6 text-sm text-gray-500">
@@ -62,13 +60,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </Suspense>
         </section>
 
-        {/* Subscription */}
-        <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-16">
+        <section className="max-w-5xl mx-auto px-6 sm:px-10 pb-8">
           <SubscriptionForm />
         </section>
       </main>
 
-      <Footer />
+      <div className="pt-2 pb-6 text-center text-sm text-gray-400">
+        © {new Date().getFullYear()} جميع الحقوق محفوظة لعبد الله خليل العربي
+      </div>
     </>
   )
 }
