@@ -11,7 +11,7 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
 
 export const metadata: Metadata = {
   title: {
-    default: 'العربي | نشرة إخبارية',
+    default: 'النشرة الأسبوعية',
     template: '%s | العربي',
   },
   description: 'نشرة إخبارية عربية متميزة — محتوى أصيل ومنتقى بعناية',
