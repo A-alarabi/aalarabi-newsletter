@@ -100,7 +100,7 @@ export default function SubscriptionFormClient({ settings }: Props) {
         {/* ── Content: title + description ── */}
         <div className="px-5 pt-2.5 pb-3 text-right">
           <h2 className="text-[18px] font-black text-gray-900 leading-snug mb-1.5">
-            {settings.siteName}
+            {"حاب يوصلك إيميل مع كل نشرة؟"}
           </h2>
           {settings.description && (
             <p className="text-[12.5px] text-gray-500 leading-relaxed">
@@ -172,7 +172,7 @@ export default function SubscriptionFormClient({ settings }: Props) {
 
           {/* Policy text */}
           <p className="mt-2.5 text-[11px] text-gray-400 text-right">
-            لن نشارك بريدك مع أي طرف آخر. بإمكانك إلغاء الاشتراك في أي وقت.
+            لن نشارك بريدك مع أي طرف آخر. 
           </p>
         </div>
 
