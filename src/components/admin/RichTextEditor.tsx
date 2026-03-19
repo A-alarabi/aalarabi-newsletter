@@ -1,8 +1,9 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import BaseImage from '@tiptap/extension-image'
+import ResizableImageNodeView from './ResizableImageNodeView'
 import Heading from '@tiptap/extension-heading'
 import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
@@ -12,10 +13,10 @@ import TextAlign from '@tiptap/extension-text-align'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import Link from '@tiptap/extension-link'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { cn } from '@/lib/utils'
 
-// Extended Image with alignment + width attributes
+// Extended Image with alignment + float + width attributes + drag-handle NodeView
 const Image = BaseImage.extend({
   addAttributes() {
     return {
@@ -25,12 +26,20 @@ const Image = BaseImage.extend({
         parseHTML: (el) => (el as HTMLImageElement).getAttribute('data-align') || 'center',
         renderHTML: (attrs) => ({ 'data-align': attrs.align }),
       },
+      float: {
+        default: 'none',
+        parseHTML: (el) => (el as HTMLImageElement).getAttribute('data-float') || 'none',
+        renderHTML: (attrs) => ({ 'data-float': attrs.float }),
+      },
       width: {
         default: null,
         parseHTML: (el) => (el as HTMLImageElement).getAttribute('data-width') || null,
-        renderHTML: (attrs) => attrs.width ? { 'data-width': attrs.width, width: attrs.width } : {},
+        renderHTML: (attrs) => attrs.width ? { 'data-width': attrs.width, style: `width:${attrs.width}` } : {},
       },
     }
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ResizableImageNodeView)
   },
 })
 
@@ -128,9 +137,16 @@ export default function RichTextEditor({
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
   }, [editor])
 
+  const [manualWidth, setManualWidth] = useState('')
+
   const setImageAlign = useCallback((align: 'right' | 'center' | 'left') => {
     if (!editor) return
     editor.chain().focus().updateAttributes('image', { align }).run()
+  }, [editor])
+
+  const setImageFloat = useCallback((float: 'none' | 'right' | 'left') => {
+    if (!editor) return
+    editor.chain().focus().updateAttributes('image', { float }).run()
   }, [editor])
 
   const setImageWidth = useCallback((width: string) => {
@@ -138,10 +154,17 @@ export default function RichTextEditor({
     editor.chain().focus().updateAttributes('image', { width: width || null }).run()
   }, [editor])
 
+  const applyManualWidth = useCallback(() => {
+    const px = parseInt(manualWidth, 10)
+    if (!isNaN(px) && px > 0) setImageWidth(`${px}px`)
+    else setImageWidth('')
+  }, [manualWidth, setImageWidth])
+
   if (!editor) return null
 
   const imgActive = editor.isActive('image')
   const currentAlign = (editor.getAttributes('image').align as string | undefined) || 'center'
+  const currentFloat = (editor.getAttributes('image').float as string | undefined) || 'none'
 
   return (
     <div className={cn('border border-gray-200 rounded-xl overflow-hidden bg-white', className)}>
@@ -239,30 +262,59 @@ export default function RichTextEditor({
         <div className="flex flex-wrap items-center gap-3 px-3 py-2 bg-sky-50 border-b border-sky-100 text-xs">
           <span className="text-sky-700 font-semibold shrink-0">تحكم بالصورة:</span>
 
+          {/* Alignment — only when not floated */}
+          {currentFloat === 'none' && (
+            <div className="flex items-center gap-1">
+              <span className="text-gray-500">محاذاة:</span>
+              {(['right', 'center', 'left'] as const).map((a) => {
+                const labels = { right: 'يمين', center: 'وسط', left: 'يسار' }
+                return (
+                  <button key={a} type="button" onClick={() => setImageAlign(a)}
+                    className={cn('px-2 py-0.5 rounded text-xs border transition-colors',
+                      currentAlign === a ? 'bg-[#1a1a2e] text-white border-[#1a1a2e]' : 'bg-white border-gray-200 hover:bg-gray-50')}>
+                    {labels[a]}
+                  </button>
+                )
+              })}
+              <div className="w-px h-4 bg-sky-200 mx-1" />
+            </div>
+          )}
+
+          {/* Float / text-wrap */}
           <div className="flex items-center gap-1">
-            <span className="text-gray-500">محاذاة:</span>
-            {(['right', 'center', 'left'] as const).map((a) => {
-              const labels = { right: 'يمين', center: 'وسط', left: 'يسار' }
-              return (
-                <button key={a} type="button" onClick={() => setImageAlign(a)}
-                  className={cn('px-2 py-0.5 rounded text-xs border transition-colors',
-                    currentAlign === a ? 'bg-[#1a1a2e] text-white border-[#1a1a2e]' : 'bg-white border-gray-200 hover:bg-gray-50')}>
-                  {labels[a]}
-                </button>
-              )
-            })}
+            <span className="text-gray-500">التفاف النص:</span>
+            {([['none', 'لا التفاف'], ['right', 'يمين ↩'], ['left', '↪ يسار']] as const).map(([f, label]) => (
+              <button key={f} type="button" onClick={() => setImageFloat(f)}
+                className={cn('px-2 py-0.5 rounded text-xs border transition-colors',
+                  currentFloat === f ? 'bg-[#e63946] text-white border-[#e63946]' : 'bg-white border-gray-200 hover:bg-gray-50')}>
+                {label}
+              </button>
+            ))}
           </div>
 
           <div className="w-px h-4 bg-sky-200" />
 
+          {/* Manual pixel width */}
           <div className="flex items-center gap-1">
-            <span className="text-gray-500">الحجم:</span>
-            {[['صغير', '30%'], ['متوسط', '60%'], ['كامل', '100%'], ['افتراضي', '']].map(([label, w]) => (
-              <button key={label} type="button" onClick={() => setImageWidth(w)}
-                className="px-2 py-0.5 rounded text-xs bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
-                {label}
-              </button>
-            ))}
+            <span className="text-gray-500">العرض:</span>
+            <input
+              type="number"
+              min={60}
+              max={2000}
+              placeholder="px"
+              value={manualWidth}
+              onChange={(e) => setManualWidth(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyManualWidth() } }}
+              className="w-16 px-1.5 py-0.5 border border-gray-200 rounded text-xs bg-white focus:outline-none focus:border-sky-400"
+            />
+            <button type="button" onClick={applyManualWidth}
+              className="px-2 py-0.5 rounded text-xs bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
+              تطبيق
+            </button>
+            <button type="button" onClick={() => { setManualWidth(''); setImageWidth('') }}
+              className="px-2 py-0.5 rounded text-xs bg-white border border-gray-200 hover:bg-gray-50 transition-colors">
+              افتراضي
+            </button>
           </div>
         </div>
       )}

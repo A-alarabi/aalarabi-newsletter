@@ -56,6 +56,7 @@ body {
 .tiptap {
   outline: none;
   min-height: 400px;
+  display: flow-root; /* contain floated images */
 }
 
 .tiptap p.is-editor-empty:first-child::before {
@@ -137,10 +138,27 @@ body {
   display: block;
 }
 
-/* Tiptap image alignment */
+/* Tiptap image alignment (no-float fallback) */
 .tiptap img[data-align="right"]  { margin-right: 0; margin-left: auto; display: block; }
 .tiptap img[data-align="center"] { margin-left: auto; margin-right: auto; display: block; }
 .tiptap img[data-align="left"]   { margin-left: 0; margin-right: auto; display: block; }
+
+/* Public newsletter: float-based text wrap (mirrors ResizableImageNodeView inline styles) */
+.newsletter-content img[data-float="right"] {
+  float: right;
+  margin: 0.25rem 0 1rem 1.5rem;
+  max-width: 65%;
+}
+.newsletter-content img[data-float="left"] {
+  float: left;
+  margin: 0.25rem 1.5rem 1rem 0;
+  max-width: 65%;
+}
+.newsletter-content img[data-width] {
+  width: attr(data-width);
+}
+/* Ensure prose container clears floats */
+.newsletter-content { display: flow-root; }
 
 /* Smooth transitions */
 a,

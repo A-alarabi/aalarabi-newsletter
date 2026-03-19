@@ -23,8 +23,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!newsletter) return {}
 
   const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-  const ogImage = newsletter.coverImage
-    ? { url: newsletter.coverImage, width: 1200, height: 630, alt: newsletter.title }
+
+  // Ensure cover image URL is always absolute (Supabase URLs already are;
+  // legacy local paths like /uploads/... get the siteUrl prepended)
+  const rawCover = newsletter.coverImage
+  const absoluteCover = rawCover
+    ? rawCover.startsWith('http') ? rawCover : `${siteUrl}${rawCover}`
+    : null
+
+  const ogImage = absoluteCover
+    ? { url: absoluteCover, width: 1200, height: 630, alt: newsletter.title }
     : null
 
   return {
@@ -40,10 +48,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ...(ogImage ? { images: [ogImage] } : {}),
     },
     twitter: {
-      card: newsletter.coverImage ? 'summary_large_image' : 'summary',
+      card: absoluteCover ? 'summary_large_image' : 'summary',
       title: newsletter.title,
       description: newsletter.description,
-      ...(newsletter.coverImage ? { images: [newsletter.coverImage] } : {}),
+      ...(absoluteCover ? { images: [absoluteCover] } : {}),
     },
   }
 }
