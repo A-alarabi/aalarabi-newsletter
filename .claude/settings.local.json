@@ -14,7 +14,8 @@
       "Bash(node -e:*)",
       "Bash(/usr/bin/sqlite3 /Users/akh./Documents/Persona/NewsLetter/prisma/dev.db \".tables\")",
       "Bash(ls -la /Users/akh./Documents/Persona/NewsLetter/*.db)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

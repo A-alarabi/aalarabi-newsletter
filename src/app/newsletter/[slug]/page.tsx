@@ -22,15 +22,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const newsletter = await getNewsletter(slug)
   if (!newsletter) return {}
 
+  const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const ogImage = newsletter.coverImage
+    ? { url: newsletter.coverImage, width: 1200, height: 630, alt: newsletter.title }
+    : null
+
   return {
     title: newsletter.title,
     description: newsletter.description,
     openGraph: {
       title: newsletter.title,
       description: newsletter.description,
-      images: newsletter.coverImage ? [newsletter.coverImage] : [],
+      url: `${siteUrl}/newsletter/${newsletter.slug}`,
       type: 'article',
       locale: 'ar_SA',
+      publishedTime: newsletter.publishedAt?.toISOString(),
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+    twitter: {
+      card: newsletter.coverImage ? 'summary_large_image' : 'summary',
+      title: newsletter.title,
+      description: newsletter.description,
+      ...(newsletter.coverImage ? { images: [newsletter.coverImage] } : {}),
     },
   }
 }

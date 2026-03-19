@@ -1,9 +1,35 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import SiteHeader from '@/components/layout/SiteHeader'
 import NewsletterGrid from '@/components/home/NewsletterGrid'
 import SubscriptionForm from '@/components/newsletter/SubscriptionForm'
 import { prisma } from '@/lib/prisma'
+import { getSiteSettings } from '@/lib/site'
 import type { NewsletterListItem } from '@/types'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings()
+  const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  return {
+    title: settings.siteName,
+    description: settings.description,
+    openGraph: {
+      title: settings.siteName,
+      description: settings.description,
+      url: siteUrl,
+      siteName: settings.siteName,
+      locale: 'ar_SA',
+      type: 'website',
+      ...(settings.logoUrl ? { images: [{ url: settings.logoUrl, width: 400, height: 400, alt: settings.siteName }] } : {}),
+    },
+    twitter: {
+      card: 'summary',
+      title: settings.siteName,
+      description: settings.description,
+      ...(settings.logoUrl ? { images: [settings.logoUrl] } : {}),
+    },
+  }
+}
 
 interface HomePageProps {
   searchParams: Promise<{ search?: string }>

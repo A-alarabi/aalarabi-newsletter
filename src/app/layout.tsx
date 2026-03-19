@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'النشرة الأسبوعية',
     template: '%s | العربي',
   },
-  description: 'نشرة إخبارية عربية متميزة — محتوى أصيل ومنتقى بعناية',
+  description: 'نشرة لكل ما يجذب إنتباهي خلال الأسبوع — محتوى منتقى بعناية',
   keywords: ['نشرة', 'عربي', 'أخبار', 'مقالات'],
   openGraph: {
     locale: 'ar_SA',
