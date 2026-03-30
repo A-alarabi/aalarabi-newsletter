@@ -3,6 +3,8 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import SiteHeader from '@/components/layout/SiteHeader'
 import NewsletterContent from '@/components/newsletter/NewsletterContent'
+import LikeButton from '@/components/newsletter/LikeButton'
+import ShareButton from '@/components/newsletter/ShareButton'
 import SubscriptionForm from '@/components/newsletter/SubscriptionForm'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
@@ -101,6 +103,12 @@ export default async function NewsletterPage({ params }: PageProps) {
 
           {/* Content */}
           <NewsletterContent content={newsletter.content} />
+
+          {/* Like & Share */}
+          <div className="mt-10 flex justify-center gap-3">
+            <LikeButton newsletterId={newsletter.id} initialLikes={newsletter.likes} />
+            <ShareButton title={newsletter.title} description={newsletter.description} slug={newsletter.slug} />
+          </div>
         </article>
 
         {/* Subscribe */}
