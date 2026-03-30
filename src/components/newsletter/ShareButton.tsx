@@ -11,6 +11,7 @@ interface ShareButtonProps {
 
 async function generateShareImage(
   title: string,
+  description: string,
   coverImage?: string | null
 ): Promise<File> {
   const WIDTH = 1080
@@ -20,24 +21,36 @@ async function generateShareImage(
   canvas.height = HEIGHT
   const ctx = canvas.getContext('2d')!
 
-  // Background gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, HEIGHT)
-  grad.addColorStop(0, '#1a1a2e')
-  grad.addColorStop(1, '#16213e')
-  ctx.fillStyle = grad
+  // Background — clean white
+  ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
-  let imageY = 280
+  // Top accent bar
+  ctx.fillStyle = '#e63946'
+  ctx.fillRect(0, 0, WIDTH, 12)
+
+  // "النشرة الأسبوعية" branding at top
+  ctx.fillStyle = '#1a1a2e'
+  ctx.textAlign = 'center'
+  ctx.direction = 'rtl'
+  ctx.font = 'bold 42px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
+  ctx.fillText('النشرة الأسبوعية', WIDTH / 2, 100)
+
+  // Thin separator under branding
+  ctx.fillStyle = '#e63946'
+  ctx.fillRect(WIDTH / 2 - 40, 130, 80, 4)
+
+  let contentY = 200
 
   // Cover image
   if (coverImage) {
     try {
       const img = await loadImage(coverImage)
       const imgW = WIDTH - 120
-      const imgH = 700
+      const imgH = 680
       const x = 60
-      const y = imageY
-      const radius = 32
+      const y = contentY
+      const radius = 24
 
       ctx.save()
       ctx.beginPath()
@@ -53,7 +66,6 @@ async function generateShareImage(
       ctx.closePath()
       ctx.clip()
 
-      // Cover the area maintaining aspect ratio
       const scale = Math.max(imgW / img.width, imgH / img.height)
       const sw = imgW / scale
       const sh = imgH / scale
@@ -62,39 +74,71 @@ async function generateShareImage(
       ctx.drawImage(img, sx, sy, sw, sh, x, y, imgW, imgH)
       ctx.restore()
 
-      imageY = y + imgH + 80
+      contentY = y + imgH + 60
     } catch {
-      imageY = 400
+      contentY = 300
     }
   } else {
-    imageY = 400
+    contentY = 300
   }
 
-  // Title text (RTL Arabic)
-  ctx.fillStyle = '#ffffff'
-  ctx.textAlign = 'center'
+  // Title
+  ctx.fillStyle = '#1a1a2e'
+  ctx.textAlign = 'right'
   ctx.direction = 'rtl'
 
-  const fontSize = title.length > 40 ? 56 : 68
-  ctx.font = `bold ${fontSize}px -apple-system, "SF Pro Display", "Segoe UI", sans-serif`
+  const titleSize = title.length > 40 ? 52 : 62
+  ctx.font = `bold ${titleSize}px -apple-system, "SF Pro Display", "Segoe UI", sans-serif`
 
-  const lines = wrapText(ctx, title, WIDTH - 140)
-  const lineHeight = fontSize * 1.4
-  const textStartY = imageY + 40
+  const titleLines = wrapText(ctx, title, WIDTH - 160)
+  const titleLineHeight = titleSize * 1.5
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, WIDTH / 2, textStartY + i * lineHeight)
+  titleLines.forEach((line, i) => {
+    ctx.fillText(line, WIDTH - 80, contentY + i * titleLineHeight)
   })
 
-  // Accent line
-  const accentY = textStartY + lines.length * lineHeight + 40
-  ctx.fillStyle = '#e63946'
-  ctx.fillRect(WIDTH / 2 - 60, accentY, 120, 6)
+  contentY += titleLines.length * titleLineHeight + 20
 
-  // Branding
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'
-  ctx.font = '32px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
-  ctx.fillText('العربي', WIDTH / 2, HEIGHT - 100)
+  // Red accent line beside description
+  const descStartY = contentY
+  ctx.fillStyle = '#e63946'
+  ctx.fillRect(WIDTH - 80, descStartY - 4, 4, 0) // placeholder, drawn after desc
+
+  // Description
+  ctx.fillStyle = '#6b7280'
+  ctx.font = '36px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
+
+  const descLines = wrapText(ctx, description, WIDTH - 200)
+  const descLineHeight = 36 * 1.7
+  const maxDescLines = Math.min(descLines.length, 5)
+
+  // Draw accent bar on the right side of description
+  const descBlockHeight = maxDescLines * descLineHeight
+  ctx.fillStyle = '#e63946'
+  ctx.fillRect(WIDTH - 80, descStartY, 4, descBlockHeight - 10)
+
+  ctx.fillStyle = '#6b7280'
+  ctx.textAlign = 'right'
+  for (let i = 0; i < maxDescLines; i++) {
+    let line = descLines[i]
+    if (i === maxDescLines - 1 && descLines.length > maxDescLines) {
+      line = line + '...'
+    }
+    ctx.fillText(line, WIDTH - 100, descStartY + i * descLineHeight + 36)
+  }
+
+  // Bottom branding area
+  // Accent bar at bottom
+  ctx.fillStyle = '#e63946'
+  ctx.fillRect(0, HEIGHT - 12, WIDTH, 12)
+
+  // "ع" logo mark
+  ctx.fillStyle = '#1a1a2e'
+  ctx.fillRect(WIDTH / 2 - 36, HEIGHT - 130, 72, 72)
+  ctx.fillStyle = '#ffffff'
+  ctx.textAlign = 'center'
+  ctx.font = 'bold 40px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
+  ctx.fillText('ع', WIDTH / 2, HEIGHT - 82)
 
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
@@ -129,7 +173,7 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   }
   if (current) lines.push(current)
 
-  return lines.slice(0, 4) // Max 4 lines
+  return lines.slice(0, 6)
 }
 
 export default function ShareButton({ title, description, slug, coverImage }: ShareButtonProps) {
@@ -142,7 +186,7 @@ export default function ShareButton({ title, description, slug, coverImage }: Sh
     if (navigator.share) {
       setLoading(true)
       try {
-        const file = await generateShareImage(title, coverImage)
+        const file = await generateShareImage(title, description, coverImage)
         const canShareFiles = navigator.canShare?.({ files: [file] })
 
         if (canShareFiles) {
