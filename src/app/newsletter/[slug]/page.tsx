@@ -107,7 +107,7 @@ export default async function NewsletterPage({ params }: PageProps) {
           {/* Like & Share */}
           <div className="mt-10 flex justify-center gap-3">
             <LikeButton newsletterId={newsletter.id} initialLikes={newsletter.likes} />
-            <ShareButton title={newsletter.title} description={newsletter.description} slug={newsletter.slug} />
+            <ShareButton title={newsletter.title} description={newsletter.description} slug={newsletter.slug} coverImage={newsletter.coverImage} />
           </div>
         </article>
 
