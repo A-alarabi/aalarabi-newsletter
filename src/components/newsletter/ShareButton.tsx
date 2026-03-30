@@ -7,12 +7,14 @@ interface ShareButtonProps {
   description: string
   slug: string
   coverImage?: string | null
+  logoUrl?: string | null
 }
 
 async function generateShareImage(
   title: string,
   description: string,
-  coverImage?: string | null
+  coverImage?: string | null,
+  logoUrl?: string | null
 ): Promise<File> {
   const WIDTH = 1080
   const HEIGHT = 1920
@@ -132,13 +134,22 @@ async function generateShareImage(
   ctx.fillStyle = '#e63946'
   ctx.fillRect(0, HEIGHT - 12, WIDTH, 12)
 
-  // "ع" logo mark
-  ctx.fillStyle = '#1a1a2e'
-  ctx.fillRect(WIDTH / 2 - 36, HEIGHT - 130, 72, 72)
-  ctx.fillStyle = '#ffffff'
-  ctx.textAlign = 'center'
-  ctx.font = 'bold 40px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
-  ctx.fillText('ع', WIDTH / 2, HEIGHT - 82)
+  // Logo
+  if (logoUrl) {
+    try {
+      const logo = await loadImage(logoUrl)
+      const maxH = 100
+      const scale = maxH / logo.height
+      const logoW = logo.width * scale
+      ctx.drawImage(logo, (WIDTH - logoW) / 2, HEIGHT - 150, logoW, maxH)
+    } catch {
+      // Fallback text if logo fails to load
+      ctx.fillStyle = '#1a1a2e'
+      ctx.textAlign = 'center'
+      ctx.font = 'bold 40px -apple-system, "SF Pro Display", "Segoe UI", sans-serif'
+      ctx.fillText('النشرة الأسبوعية', WIDTH / 2, HEIGHT - 90)
+    }
+  }
 
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
@@ -176,7 +187,7 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines.slice(0, 6)
 }
 
-export default function ShareButton({ title, description, slug, coverImage }: ShareButtonProps) {
+export default function ShareButton({ title, description, slug, coverImage, logoUrl }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -186,7 +197,7 @@ export default function ShareButton({ title, description, slug, coverImage }: Sh
     if (navigator.share) {
       setLoading(true)
       try {
-        const file = await generateShareImage(title, description, coverImage)
+        const file = await generateShareImage(title, description, coverImage, logoUrl)
         const canShareFiles = navigator.canShare?.({ files: [file] })
 
         if (canShareFiles) {

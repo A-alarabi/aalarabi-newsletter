@@ -7,6 +7,7 @@ import LikeButton from '@/components/newsletter/LikeButton'
 import ShareButton from '@/components/newsletter/ShareButton'
 import SubscriptionForm from '@/components/newsletter/SubscriptionForm'
 import { prisma } from '@/lib/prisma'
+import { getSiteSettings } from '@/lib/site'
 import { formatDate } from '@/lib/utils'
 
 interface PageProps {
@@ -60,7 +61,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function NewsletterPage({ params }: PageProps) {
   const { slug } = await params
-  const newsletter = await getNewsletter(slug)
+  const [newsletter, settings] = await Promise.all([
+    getNewsletter(slug),
+    getSiteSettings(),
+  ])
 
   if (!newsletter) notFound()
 
@@ -107,7 +111,7 @@ export default async function NewsletterPage({ params }: PageProps) {
           {/* Like & Share */}
           <div className="mt-10 flex justify-center gap-3">
             <LikeButton newsletterId={newsletter.id} initialLikes={newsletter.likes} />
-            <ShareButton title={newsletter.title} description={newsletter.description} slug={newsletter.slug} coverImage={newsletter.coverImage} />
+            <ShareButton title={newsletter.title} description={newsletter.description} slug={newsletter.slug} coverImage={newsletter.coverImage} logoUrl={settings.logoUrl} />
           </div>
         </article>
 
